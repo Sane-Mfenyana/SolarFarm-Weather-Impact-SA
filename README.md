@@ -55,3 +55,16 @@ With our weather and solar irradiance datasets acquired, the next step is to pre
 
 Without consistent formatting and structure, we can’t perform accurate time-series analysis. Cleaning ensures we’re not modeling based on missing, misaligned, or misinterpreted data. The hourly weather data gives us granularity; the long-term GHI GeoTIFFs provide historical grounding.
 
+## 🗺️ Step 1.5: Attempt to Extract SolarGIS GeoTIFF Data
+
+As part of this project, I aimed to incorporate long-term average solar irradiance data from SolarGIS (in GeoTIFF format). This data was expected to provide a spatial view of solar potential across South Africa.
+
+### 🔍 What I Tried:
+- Uploaded the `.tif` file to [geotiff.io](https://geotiff.io), but the visual rendering was limited — the raster displayed only in grayscale and lacked the expected color gradient or metadata overlay.
+- Attempted to find alternative open-source, **web-based tools** to parse and extract the raster values (e.g. Mapshaper, GeoTIFF viewer plugins, etc.) but found that most tools require desktop GIS software (like QGIS), which I wanted to avoid for this step.
+
+### ⚠️ Limitation:
+Since this portfolio project is designed to be executed without installing external software, I made the decision to **pause this part** and proceed with the rest of the analysis using the **Open-Meteo hourly weather dataset** — which is sufficient for answering the main research question.
+
+### ✅ Moving Forward:
+The project will still maintain its integrity and value without this spatial layer, as the core focus remains on analyzing **temporal performance variability** in solar and wind energy systems using **real-time weather inputs**.

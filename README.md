@@ -68,3 +68,4 @@ Since this portfolio project is designed to be executed without installing exter
 
 ### ✅ Moving Forward:
 The project will still maintain its integrity and value without this spatial layer, as the core focus remains on analyzing **temporal performance variability** in solar and wind energy systems using **real-time weather inputs**.
+

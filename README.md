@@ -69,3 +69,81 @@ Since this portfolio project is designed to be executed without installing exter
 ### ✅ Moving Forward:
 The project will still maintain its integrity and value without this spatial layer, as the core focus remains on analyzing **temporal performance variability** in solar and wind energy systems using **real-time weather inputs**.
 
+## 🧪 Step 3: Data Exploration and Quality Check — Weather Data
+
+### 🎯 Objective  
+To understand the structure, quality, and statistical properties of the hourly weather dataset sourced from Open-Meteo. This ensures the data is clean, consistent, and usable for analyzing the impact of weather conditions on solar energy performance in South Africa.
+
+---
+
+### 📂 Dataset Info  
+The file `open-meteo-28.44S21.27E805m.csv` was uploaded to BigQuery and renamed using the following naming conventions to remove unsupported characters and improve clarity:
+
+| Original Field Name                     | Revised Field Name                     |
+|----------------------------------------|----------------------------------------|
+| `time`                                 | `time`                                 |
+| `temperature_2m (°C)`                  | `temperature_2m_c`                     |
+| `relative_humidity_2m (%)`             | `relative_humidity_2m_percent`         |
+| `dew_point_2m (°C)`                    | `dew_point_2m_c`                       |
+| `apparent_temperature (°C)`            | `apparent_temperature_c`               |
+| `precipitation_sum (mm)`              | `precipitation_sum_mm`                 |
+| `rain_sum (mm)`                        | `rain_sum_mm`                          |
+| `wind_speed_10m (km/h)`                | `wind_speed_10m_km_per_h`              |
+| `wind_direction_10m (°)`               | `wind_direction_10m_deg`               |
+| `shortwave_radiation_sum (MJ/m²)`     | `shortwave_radiation_sum_mj_per_m2`    |
+| `et0_fao_evapotranspiration (mm)`     | `et0_fao_evapotranspiration_mm`        |
+
+---
+
+### 🔍 Key Checks Performed
+
+#### 1. **Sample Preview**  
+We pulled the first 10 rows to verify schema, column types, and value formats:
+
+```sql
+SELECT * 
+FROM `bi-tutrial-401008.open_meteo.meteo_hourly`
+LIMIT 10;
+```
+### 2. **Time Range & Record Frequency**
+Confirmed the dataset's coverage and granularity:
+
+```sql
+SELECT 
+  MIN(time) AS start_date,
+  MAX(time) AS end_date,
+  COUNT(*) AS total_records,
+  COUNT(DISTINCT time) AS unique_timestamps
+FROM `bi-tutrial-401008.open_meteo.meteo_hourly`;
+```
+### 3. **Missing Data Check**
+Check for any null values in the three primary weather metrics:
+
+```sql
+SELECT
+  COUNTIF(temperature_2m_C IS NULL) AS missing_temperature,
+  COUNTIF(relative_humidity_2m_percent IS NULL) AS missing_humidity,
+  COUNTIF(wind_speed_10m_km_per_hour IS NULL) AS missing_wind_speed
+FROM `bi-tutrial-401008.open_meteo.meteo_hourly`;
+```
+### 4. **Summary Statistics**
+Generated min, max, average values for key metrcis:
+
+```sql
+SELECT
+  MIN(temperature_2m_C) AS min_temp,
+  MAX(temperature_2m_C) AS max_temp,
+  AVG(temperature_2m_C) AS avg_temp,
+  
+  MIN(relative_humidity_2m_percent) AS min_humidity,
+  MAX(relative_humidity_2m_percent) AS max_humidity,
+  AVG(relative_humidity_2m_percent) AS avg_humidity,
+  
+  MIN(wind_speed_10m_km_per_hour) AS min_wind,
+  MAX(wind_speed_10m_km_per_hour) AS max_wind,
+  AVG(wind_speed_10m_km_per_hour) AS avg_wind
+FROM `bi-tutrial-401008.open_meteo.meteo_hourly`;
+```
+
+
+

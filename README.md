@@ -145,5 +145,44 @@ SELECT
 FROM `bi-tutrial-401008.open_meteo.meteo_hourly`;
 ```
 
+## 📊 Step 5: Visualizing the Relationship Between Cloud Cover and Solar Radiation
 
+### 🧠 Objective  
+To explore whether **cloud cover (`cloud_cover_percentage`)** is a reliable predictor of **shortwave solar radiation (`shortwave_radiation_watts_per_m2`)** — a key variable affecting solar energy generation.
 
+---
+
+### 🛠️ Tools Used
+- **BigQuery**: SQL queries to filter and sample data  
+- **Tableau Desktop**: Visualized the relationship using a scatter plot  
+- **Open-Meteo API data**: Provided hourly weather observations
+
+---
+
+### 🔍 Method  
+We extracted a **random sample of 1,000 hourly rows** using BigQuery, limited to the time period between 2024-01-01 and 2024-06-30:
+
+```sql
+SELECT
+cloud_cover_percentage,
+  shortwave_radiation_watts_per_m2
+FROM
+  `bi-tutrial-401008.open_meteo.meteo_hourly`
+WHERE
+  DATE(datetime) BETWEEN '2024-01-01' AND '2024-06-30'
+ORDER BY RAND()
+LIMIT 1000;
+```
+This was exported and visualized in Tableau using a scatter plot where:
+- X-axis = `cloud_cover_percent`
+- Y-axis = `shortwave_radiation_watts_per_m2`
+
+### 📈 Finding
+The relationship is visually weak and statistically insignificant, with a Pearson correlation coefficient of -0.065. This implies:
+- Cloud cover has some negative effect, but not enough to act as a standalone predictor.
+- The scatter plot showed high variability in radiation even at similar cloud cover levels.
+
+### 💡 Business Implication
+**Relying solely on cloud cover to estimate solar performance is unreliable.**
+nergy analysts or solar operations managers should not base decisions on cloud cover alone. Other weather variables (e.g. humidity, temperature, air pressure, precipitation) must be considered. 
+This insight helps narrow the modeling focus for building more robust predictors of solar generation performance.

@@ -230,3 +230,57 @@ This reveals that solar performance analysis must account for time-of-day effect
 ## ✅ Next Step
 We now move on to analyze temperature and cloud cover effects on solar radiation, maintaining the same hourly segmentation to isolate meaningful patterns across weather variables.
   
+## 📊 Step 5: Exploratory Analysis — Weather vs Solar Radiation
+
+In this step, we visually explored how temperature and cloud cover affect solar irradiance (shortwave radiation) across key daylight hours. This helped us assess how weather variability might explain fluctuations in solar energy potential.
+
+---
+
+### 🔍 Objectives
+
+- Examine **how temperature correlates** with shortwave radiation throughout the day.
+- Investigate **how cloud cover affects solar radiation**, especially during peak sunlight hours.
+- Begin identifying **hourly patterns** that can impact solar farm efficiency.
+
+---
+
+### 🔁 Hour Buckets Defined
+
+To observe clear intra-day trends, we grouped the data into 4 logical time segments:
+
+| Hour Bucket | Time Range       |
+|-------------|------------------|
+| 06–09       | Early Morning    |
+| 10–12       | Late Morning     |
+| 13–15       | Early Afternoon  |
+| 16–18       | Late Afternoon   |
+
+---
+
+### 📈 Visualizations
+
+#### 1. Temperature vs Shortwave Radiation
+
+This scatter plot reveals a **positive correlation** between air temperature and solar radiation — but the strength of this relationship changes depending on the hour bucket. Notably:
+- Radiation increases with temperature up to a saturation point (~28–35°C).
+- Earlier hours (06–09) show lower radiation despite rising temperatures — consistent with the sun’s position.
+
+#### 2. Cloud Cover vs Shortwave Radiation
+
+This second plot highlights a clear **inverse relationship** between cloud cover and radiation:
+- High radiation levels are more likely when cloud cover is **low (0–20%)**.
+- There’s a wide radiation range even with partial cloud cover, suggesting other variables (like humidity, elevation, or haze) may also play a role.
+
+---
+
+### 🧠 Key Insights
+
+- **Morning sunlight hours are less productive**, even if the temperature is rising — likely due to lower sun angles.
+- **High radiation occurs most consistently between 10:00 and 15:00**, especially on clear days.
+- **Cloud cover >80% almost always results in minimal solar radiation**, indicating potential downtime for solar panel output.
+
+---
+
+### 🧪 Next Step
+
+We’ll now quantify these relationships further using correlation coefficients and basic regression, then apply filtering to assess **seasonal effects or high-cloud days** more directly.

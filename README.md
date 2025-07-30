@@ -186,3 +186,47 @@ The relationship is visually weak and statistically insignificant, with a Pearso
 **Relying solely on cloud cover to estimate solar performance is unreliable.**
 nergy analysts or solar operations managers should not base decisions on cloud cover alone. Other weather variables (e.g. humidity, temperature, air pressure, precipitation) must be considered. 
 This insight helps narrow the modeling focus for building more robust predictors of solar generation performance.
+
+## 📊 Step 3: Time-Bucketed Wind Speed vs Solar Radiation Analysis
+
+### 🎯 Objective
+To investigate whether wind speed has a significant correlation with solar radiation and whether this relationship is influenced by the time of day — particularly during daylight hours when solar energy generation is most active.
+
+### 🛠️ Method
+1. **Data Queried** from Open-Meteo hourly weather data:
+   ```sql
+   SELECT
+     DATE(time) AS day,
+     EXTRACT(HOUR FROM time) AS hour,
+     wind_speed_10m_km_per_hour,
+     shortwave_radiation_watts_per_m2
+   FROM
+     `bi-tutorial-401008.open_meteo.meteo_hourly_2`
+   WHERE
+     shortwave_radiation_watts_per_m2 > 0
+   ```
+2. **Calculated Field in Tableau:
+   IF [hour] >= 6 AND [hour] <= 9 THEN "06–09"
+   ELSEIF [hour] >= 10 AND [hour] <= 12 THEN "10–12"
+   ELSEIF [hour] >= 13 AND [hour] <= 15 THEN "13–15"
+   ELSEIF [hour] >= 16 AND [hour] <= 18 THEN "16–18"
+   ELSE "Other"
+   END
+3. **Visualisation:
+   A scatter plot was created:
+  - X-axis: `wind_speed_10m_km_per_hour`
+  - Y-axis: `shortwave_radiation_watts_per_m2`
+  - Color: Hour Bucket (calculated field)
+  - Filtered to exclude "Other" time groups (non-daylight hours).
+
+## 📈 Key Insight
+- When viewed as a whole, no strong linear correlation is observed between wind speed and solar radiation.
+- However, clear daylight patterns emerge:
+  - Midday hours (10–15) concentrate the highest solar radiation, regardless of wind speed.
+  - Morning and late afternoon show lower radiation levels, consistent with expected sun angle and exposure.
+ 
+This reveals that solar performance analysis must account for time-of-day effects, and that meteorological correlations may only appear when data is     appropriately segmented.
+
+## ✅ Next Step
+We now move on to analyze temperature and cloud cover effects on solar radiation, maintaining the same hourly segmentation to isolate meaningful patterns across weather variables.
+  

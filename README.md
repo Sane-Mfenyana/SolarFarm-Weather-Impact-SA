@@ -334,3 +334,10 @@ END
 - Placed legend above visualizations for clarity and to reduce vertical spacing.
 - Added descriptive dashboard title.
 - Arranged both box plots and dual-axis chart to maximize comparative readability.
+
+### 📊 **Insights**
+- Peak solar radiation consistently occurs in Late Morning to Early Afternoon.
+- Temperature peaks lag behind radiation peaks, likely due to the time it takes for the environment to absorb and re-radiate heat.
+- Box plots reveal greater variability in shortwave radiation than temperature, especially in transitional periods (morning and evening).
+- The dual-axis chart confirms a clear correlation between radiation and temperature, but also shows that weather conditions can cause daily deviations.
+

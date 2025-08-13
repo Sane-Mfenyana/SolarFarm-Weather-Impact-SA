@@ -281,6 +281,56 @@ This second plot highlights a clear **inverse relationship** between cloud cover
 
 ---
 
-### 🧪 Next Step
+## Step 6: Visualization of Hourly Weather Patterns – Box Plots & Dual-Axis Chart
 
-We’ll now quantify these relationships further using correlation coefficients and basic regression, then apply filtering to assess **seasonal effects or high-cloud days** more directly.
+### 🎯 Goal
+To visualize and compare **temperature** and **shortwave radiation** distributions across different times of day, and to explore the lag effect between radiation peaks and temperature peaks.
+
+---
+
+### 🛠 Methods & Micro Steps
+
+#### 1. **Data Source**
+- Used previously extracted **non-aggregated hourly weather dataset** from BigQuery.
+- Columns used:  
+  - `datetime` – Timestamp of reading  
+  - `temperature_C` – Air temperature (°C)  
+  - `shortwave_radiation` – Solar radiation (W/m²)  
+  - `windspeed_kph` – Wind speed (km/h)
+
+---
+
+#### 2. **Time-of-Day Buckets (Tableau Calculated Field)**
+Created a calculated field to group hours into logical daily periods:
+```tableau
+IF DATEPART('hour', [datetime]) >= 0 AND DATEPART('hour', [datetime]) <= 5 THEN 'Night'
+ELSEIF DATEPART('hour', [datetime]) >= 6 AND DATEPART('hour', [datetime]) <= 9 THEN 'Early Morning'
+ELSEIF DATEPART('hour', [datetime]) >= 10 AND DATEPART('hour', [datetime]) <= 13 THEN 'Late Morning'
+ELSEIF DATEPART('hour', [datetime]) >= 14 AND DATEPART('hour', [datetime]) <= 17 THEN 'Afternoon'
+ELSEIF DATEPART('hour', [datetime]) >= 18 AND DATEPART('hour', [datetime]) <= 21 THEN 'Evening'
+ELSE 'Late Night'
+END
+```
+- Applied custom sort to ensure buckets follow a chronological order.
+
+### 3. **Box Plot Creation**
+- First Box Plot: Temperature vs Time of Day.
+  - Measure: `temperature_C` aggregated as AVG.
+- Second Box Plot: Shortwave Radiation vs Time of Day
+  - Measure: `shortwave_radiation` aggregated as AVG.
+ 
+### 4. **Dual-Axis Line Chart**
+- Plotted Temperature and Shortwave Radiation against `time_of_day_bucket`.
+- Set Temperature on primary axis and Shortwave Radiation on secondary axis.
+- Renamed axes:
+  - Temperature C
+  - Shortwave Radiation (W/m2)
+
+### 5. **Annotations**
+- Added annotation boxes to highlight Late Morning and Afternoon as periods of peak shortwave radiation.
+- Noted lag between radiation peak and temperature peak.
+
+### 6. **Dashboard Layout Finalization**
+- Placed legend above visualizations for clarity and to reduce vertical spacing.
+- Added descriptive dashboard title.
+- Arranged both box plots and dual-axis chart to maximize comparative readability.

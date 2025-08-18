@@ -28,7 +28,7 @@ By building a weather baseline, we ensure the analysis is grounded in the enviro
 | **Global Solar Atlas (South Africa – GHI daily totals GeoTIFF LTAy)** | Offers a **validated, World Bank-backed source** of long-term solar irradiance data. Acts as a **cross-reference** to Solargis data to ensure accuracy and consistency in baseline solar resource assessments. |
 | **Open-Meteo Hourly Forecasts** | Supplies **short-term hourly weather data** (e.g. temperature, irradiance, cloud cover). Enables **granular daily analysis** of weather’s effect on solar output. Useful for identifying **daily fluctuations and anomalies**. |
 
-## 📊 Step 3: Data Cleaning & Preparation
+## 📊 Step 4: Data Cleaning & Preparation
 
 ### Overview
 
@@ -55,12 +55,12 @@ With our weather and solar irradiance datasets acquired, the next step is to pre
 
 Without consistent formatting and structure, we can’t perform accurate time-series analysis. Cleaning ensures we’re not modeling based on missing, misaligned, or misinterpreted data. The hourly weather data gives us granularity; the long-term GHI GeoTIFFs provide historical grounding.
 
-## 🗺️ Step 1.5: Attempt to Extract SolarGIS GeoTIFF Data
+## 🗺️ Step 4.1: Attempt to Extract SolarGIS GeoTIFF Data
 
 As part of this project, I aimed to incorporate long-term average solar irradiance data from SolarGIS (in GeoTIFF format). This data was expected to provide a spatial view of solar potential across South Africa.
 
 ### 🔍 What I Tried:
-- Uploaded the `.tif` file to [geotiff.io](https://geotiff.io), but the visual rendering was limited — the raster displayed only in grayscale and lacked the expected color gradient or metadata overlay.
+- Uploaded the `.tif` file to [geotiff.io](https://geotiff.io), but the visual rendering was limited. The raster displayed only in grayscale and lacked the expected color gradient or metadata overlay.
 - Attempted to find alternative open-source, **web-based tools** to parse and extract the raster values (e.g. Mapshaper, GeoTIFF viewer plugins, etc.) but found that most tools require desktop GIS software (like QGIS), which I wanted to avoid for this step.
 
 ### ⚠️ Limitation:
@@ -69,7 +69,7 @@ Since this portfolio project is designed to be executed without installing exter
 ### ✅ Moving Forward:
 The project will still maintain its integrity and value without this spatial layer, as the core focus remains on analyzing **temporal performance variability** in solar and wind energy systems using **real-time weather inputs**.
 
-## 🧪 Step 3: Data Exploration and Quality Check — Weather Data
+## 🧪 Step 5: Data Exploration and Quality Check — Weather Data
 
 ### 🎯 Objective  
 To understand the structure, quality, and statistical properties of the hourly weather dataset sourced from Open-Meteo. This ensures the data is clean, consistent, and usable for analyzing the impact of weather conditions on solar energy performance in South Africa.
@@ -97,15 +97,15 @@ The file `open-meteo-28.44S21.27E805m.csv` was uploaded to BigQuery and renamed 
 
 ### 🔍 Key Checks Performed
 
-#### 1. **Sample Preview**  
+#### 5.1. **Sample Preview**  
 We pulled the first 10 rows to verify schema, column types, and value formats:
 
 ```sql
 SELECT * 
-FROM `bi-tutrial-401008.open_meteo.meteo_hourly`
+FROM `bi-tutrial-401008.open_meteo.meteo_hourly_2`
 LIMIT 10;
 ```
-### 2. **Time Range & Record Frequency**
+### 5.2. **Time Range & Record Frequency**
 Confirmed the dataset's coverage and granularity:
 
 ```sql
@@ -114,9 +114,9 @@ SELECT
   MAX(time) AS end_date,
   COUNT(*) AS total_records,
   COUNT(DISTINCT time) AS unique_timestamps
-FROM `bi-tutrial-401008.open_meteo.meteo_hourly`;
+FROM `bi-tutrial-401008.open_meteo.meteo_hourly_2`;
 ```
-### 3. **Missing Data Check**
+### 5.33. **Missing Data Check**
 Check for any null values in the three primary weather metrics:
 
 ```sql
@@ -124,9 +124,9 @@ SELECT
   COUNTIF(temperature_2m_C IS NULL) AS missing_temperature,
   COUNTIF(relative_humidity_2m_percent IS NULL) AS missing_humidity,
   COUNTIF(wind_speed_10m_km_per_hour IS NULL) AS missing_wind_speed
-FROM `bi-tutrial-401008.open_meteo.meteo_hourly`;
+FROM `bi-tutrial-401008.open_meteo.meteo_hourly_2`;
 ```
-### 4. **Summary Statistics**
+### 5.4. **Summary Statistics**
 Generated min, max, average values for key metrcis:
 
 ```sql
@@ -142,10 +142,10 @@ SELECT
   MIN(wind_speed_10m_km_per_hour) AS min_wind,
   MAX(wind_speed_10m_km_per_hour) AS max_wind,
   AVG(wind_speed_10m_km_per_hour) AS avg_wind
-FROM `bi-tutrial-401008.open_meteo.meteo_hourly`;
+FROM `bi-tutrial-401008.open_meteo.meteo_hourly_2`;
 ```
 
-## 📊 Step 5: Visualizing the Relationship Between Cloud Cover and Solar Radiation
+## 📊 Step 6: Visualizing the Relationship Between Cloud Cover and Solar Radiation
 
 ### 🧠 Objective  
 To explore whether **cloud cover (`cloud_cover_percentage`)** is a reliable predictor of **shortwave solar radiation (`shortwave_radiation_watts_per_m2`)** — a key variable affecting solar energy generation.
@@ -167,7 +167,7 @@ SELECT
 cloud_cover_percentage,
   shortwave_radiation_watts_per_m2
 FROM
-  `bi-tutrial-401008.open_meteo.meteo_hourly`
+  `bi-tutrial-401008.open_meteo.meteo_hourly_2`
 WHERE
   DATE(datetime) BETWEEN '2024-01-01' AND '2024-06-30'
 ORDER BY RAND()
@@ -184,10 +184,10 @@ The relationship is visually weak and statistically insignificant, with a Pearso
 
 ### 💡 Business Implication
 **Relying solely on cloud cover to estimate solar performance is unreliable.**
-nergy analysts or solar operations managers should not base decisions on cloud cover alone. Other weather variables (e.g. humidity, temperature, air pressure, precipitation) must be considered. 
+Energy analysts or solar operations managers should not base decisions on cloud cover alone. Other weather variables (e.g. humidity, temperature, air pressure, precipitation) must be considered. 
 This insight helps narrow the modeling focus for building more robust predictors of solar generation performance.
 
-## 📊 Step 3: Time-Bucketed Wind Speed vs Solar Radiation Analysis
+## 📊 Step 7: Time-Bucketed Wind Speed vs Solar Radiation Analysis
 
 ### 🎯 Objective
 To investigate whether wind speed has a significant correlation with solar radiation and whether this relationship is influenced by the time of day — particularly during daylight hours when solar energy generation is most active.
@@ -230,7 +230,7 @@ This reveals that solar performance analysis must account for time-of-day effect
 ## ✅ Next Step
 We now move on to analyze temperature and cloud cover effects on solar radiation, maintaining the same hourly segmentation to isolate meaningful patterns across weather variables.
   
-## 📊 Step 5: Exploratory Analysis — Weather vs Solar Radiation
+## 📊 Step 8: Exploratory Analysis — Weather vs Solar Radiation
 
 In this step, we visually explored how temperature and cloud cover affect solar irradiance (shortwave radiation) across key daylight hours. This helped us assess how weather variability might explain fluctuations in solar energy potential.
 
@@ -281,7 +281,7 @@ This second plot highlights a clear **inverse relationship** between cloud cover
 
 ---
 
-## Step 6: Visualization of Hourly Weather Patterns – Box Plots & Dual-Axis Chart
+## Step 9: Visualization of Hourly Weather Patterns – Box Plots & Dual-Axis Chart
 
 ### 🎯 Goal
 To visualize and compare **temperature** and **shortwave radiation** distributions across different times of day, and to explore the lag effect between radiation peaks and temperature peaks.

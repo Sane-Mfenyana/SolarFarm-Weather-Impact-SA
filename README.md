@@ -341,3 +341,73 @@ END
 - Box plots reveal greater variability in shortwave radiation than temperature, especially in transitional periods (morning and evening).
 - The dual-axis chart confirms a clear correlation between radiation and temperature, but also shows that weather conditions can cause daily deviations.
 
+# Step 10: Evaluate Forecasting Accuracy with Error Metrics
+
+In this step, we measure how well our weather-based energy forecasts align with the actual recorded generation data across **Photovoltaic (PV)**, **Concentrated Solar Power (CSP)**, and **Wind** energy sources.  
+
+By calculating **MAE, RMSE, and MAPE**, we quantify the **forecast accuracy** — which directly impacts both operational planning and financial outcomes for renewable energy investments.
+
+---
+
+## Why Error Metrics Matter
+
+Forecast errors affect:
+
+- **Operational Decisions**  
+  Utilities and Independent Power Producers (IPPs) rely on accurate forecasts to plan grid balancing, storage usage, and reserve power requirements.  
+
+- **Financial Performance**  
+  Large errors can mean overestimating or underestimating supply, which either forces **load shedding (supply shortfall)** or incurs **penalties and imbalance costs**.  
+
+- **Investor Confidence**  
+  Smaller, consistent errors improve investor trust in renewable projects by showing that generation outputs can be reliably forecasted.
+
+---
+
+## Metrics Explained
+
+### 1. **Mean Absolute Error (MAE)**
+- **Formula:** Average of the absolute difference between forecasted and actual values.  
+- **Interpretation:** On average, how many MW the forecasts are off by.  
+- **Results:**  
+  - PV = **545.48**  
+  - CSP = **79.52**  
+  - Wind = **641.62**  
+
+➡️ CSP has the lowest MAE, meaning its forecasts are closest on average. PV and Wind deviate more.  
+
+---
+
+### 2. **Root Mean Squared Error (RMSE)**
+- **Formula:** Square root of the average squared difference between forecasted and actual values.  
+- **Interpretation:** Penalizes larger errors more heavily. Good for spotting volatility.  
+- **Results:**  
+  - PV = **817.04**  
+  - CSP = **100.89**  
+  - Wind = **768.36**  
+
+➡️ CSP again shows strong stability. PV and Wind not only deviate more, but their larger forecasting errors are more volatile.  
+
+---
+
+### 3. **Mean Absolute Percentage Error (MAPE)**
+- **Formula:** Average of the absolute percentage errors relative to actual values.  
+- **Interpretation:** Shows how big the errors are compared to actual generation, expressed as a percentage.  
+- **Results:**  
+  - PV = **158,383.67%**  
+  - CSP = **9,989.43%**  
+  - Wind = **101.22%**  
+
+➡️ CSP and PV show extremely inflated MAPE values due to very small actual generation numbers at certain times (division by values close to zero exaggerates error). Wind shows a more interpretable error rate (~101%).  
+
+---
+
+## Insights for the Project
+
+1. **CSP is the most predictable** of the three, with the lowest MAE and RMSE.  
+2. **PV has high error volatility**, which matches the reality of solar being highly sensitive to sudden weather shifts (cloud cover, radiation changes).  
+3. **MAPE is unreliable** in cases where actual generation is near zero — but it highlights the risk of underperforming forecasts during low-output periods.  
+4. These metrics give **hard evidence** that forecast uncertainty varies by energy source, and that financial models must account for these risks when estimating **returns, penalties, or reserve energy costs**.  
+
+---
+

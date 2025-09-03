@@ -411,3 +411,61 @@ Forecast errors affect:
 
 ---
 
+# Step 10: Evaluate Model Performance Against Actuals
+
+In this step, we tested how well our regression models (PV, CSP, Wind) performed when compared against **actual Eskom generation data**. This is where our analysis transitioned from pure modeling into validation, helping us assess the reliability of using weather as a predictor of renewable energy output.
+
+---
+
+## Key Evaluation Metrics
+
+We calculated three core error metrics to evaluate each energy type:
+
+- **MAE (Mean Absolute Error):**  
+  Measures average absolute error in predictions. Lower values = better accuracy.  
+
+- **RMSE (Root Mean Square Error):**  
+  Gives higher weight to large errors, making it sensitive to big misses.  
+
+- **MAPE (Mean Absolute Percentage Error):**  
+  Expresses error as a percentage of actual values. Useful for interpretability, though unstable with very small denominators.  
+
+---
+
+## Results
+
+| Energy Type | MAE    | RMSE    | MAPE        |
+|-------------|--------|---------|-------------|
+| PV          | 545.48 | 817.04  | 158,383.67  |
+| CSP         | 79.52  | 100.89  | 9,989.43    |
+| Wind        | 641.62 | 768.36  | 101.22      |
+
+**Interpretation:**  
+- CSP showed the **lowest error across all metrics**, meaning its relationship with weather was captured more reliably by the model.  
+- PV and Wind models displayed **large errors**, suggesting higher variability and that more features (or better geographic alignment of data) may be required to improve predictions.  
+
+---
+
+## Visualization
+
+We created a grouped bar chart to summarize the error metrics across energy types.
+
+### Static Preview
+<img width="777" height="659" alt="Error Metrics by Technology_ Comparing Model vs Actual Power Output" src="https://github.com/user-attachments/assets/03916447-3748-4faa-8092-385f898c4a91" />
+
+
+### Interactive Dashboard
+[View Interactive Tableau Dashboard](https://public.tableau.com/views/ErrorMetricsComparisonAcrossRenewableTechnologies/Dashboard1?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link)
+
+This dual approach allows immediate readability through the static chart, while also demonstrating interactivity and BI skill via Tableau Public.
+
+---
+
+## Why This Matters
+
+Validating models against **real-world energy data** bridges the gap between theory and practice. For renewable energy stakeholders, this type of evaluation:  
+- Highlights which technologies (PV, CSP, Wind) are more predictable based on weather.  
+- Identifies where **financial forecasting is more stable** (e.g.CSP) versus where risk is higher (PV, Wind).  
+- Sets the stage for translating weather-driven performance into **economic impacts and decision-making value**.  
+
+---

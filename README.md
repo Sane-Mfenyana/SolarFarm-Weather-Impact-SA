@@ -469,3 +469,59 @@ Validating models against **real-world energy data** bridges the gap between the
 - Sets the stage for translating weather-driven performance into **economic impacts and decision-making value**.  
 
 ---
+
+# Step 11: Time-of-Day Analysis of Forecast Errors
+
+In this step, we assessed how model accuracy varied by **time of day**, breaking the results into the buckets defined earlier: *Morning, Midday, Afternoon, Evening, Night*. This helped us understand whether systematic over- or under-prediction occurred during certain periods.
+
+---
+
+## Query: Time-of-Day Error Metrics (MAE)
+
+We grouped forecast errors by energy type and time bucket, then calculated the **Mean Absolute Error (MAE)**:
+
+```sql
+CREATE OR REPLACE TABLE analysis.error_by_time_bucket AS
+SELECT
+  energy_type,
+  time_bucket,
+  AVG(ABS(predicted_output - actual_output)) AS mae
+FROM `analysis.model_vs_actual_long`
+GROUP BY energy_type, time_bucket
+ORDER BY energy_type, time_bucket;
+```
+## Visualization
+
+We created a grouped bar chart, comparing MAE across different time buckets for each renewable type (PV, CSP & Wind).
+
+### Static Preview
+<img width="1119" height="667" alt="Forecast Error by Time of Day and Energy Type" src="https://github.com/user-attachments/assets/0c6d3d1a-7b7e-4ab9-a871-e5448797f297" />
+
+### Interactive Dashboard
+https://public.tableau.com/views/ForecastErrorbyTimeofDayandEnergytype/Sheet1?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link
+
+## Interpretation of Results
+
+- PV (Solar Photovoltaic):
+  - Error peaked at Midday (MAE ~1400), when solar generation is highest and weather-driven variability is strongest.
+  - Morning (893) and Afternoon (573) also showed higher errors compared to Night or Evening, reflecting model difficulty in capturing ramp-up and ramp-down.
+  - Evening (82) and Night (54) had very low errors, as expected, since PV output is nearly zero and easy to predict.
+- CSP (Concentrated Solar Power):
+  - Errors were highest in the Evening (103) and Afternoon (101), showing difficulty in capturing thermal storage/release effects.
+  - Morning (67) and Midday (79) had moderate errors, aligning with the sun's rising and peak activity.
+  - Night (54) again showed the lowest error.
+- Wind:
+  - Errors were relatively more stable across the day but peaked at Midday (801) and Morning (686).
+  - Afternoon (618) and Night (587) were slightly better, while Evening (553) showed the lowest error.
+  - This reflects the complex and less predictable diurnal wind patterns.
+ 
+## Why This Matters
+
+This analysis demonstrates that forecast errors are not evenly distributed across the day:
+  - Solar (PV, CSP) models struggle most when generation is highest (midday, afternoon).
+  - Wind has less predictable daytime variability, but nighttime predictions are relatively more reliable.
+These insights tie back to the project’s broader goal:
+  - Grid Operators can use this to anticipate when renewable forecasts are least reliable (e.g., midday solar peaks).
+  - Financial Planners can better price risks around periods of high uncertainty.
+  - Future Model Improvements could focus specifically on these high-error windows, rather than uniformly across all hours.
+

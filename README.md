@@ -497,9 +497,6 @@ We created a grouped bar chart, comparing MAE across different time buckets for 
 ### Static Preview
 <img width="1119" height="667" alt="Forecast Error by Time of Day and Energy Type" src="https://github.com/user-attachments/assets/0c6d3d1a-7b7e-4ab9-a871-e5448797f297" />
 
-### Interactive Dashboard
-https://public.tableau.com/views/ForecastErrorbyTimeofDayandEnergytype/Sheet1?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link
-
 ## Interpretation of Results
 
 - PV (Solar Photovoltaic):

@@ -594,7 +594,7 @@ WITH correlations AS (
 
 **Correlation of Weather Factors With CSP vs PV Energy Output**
 
-![Correlation Viz](<img width="862" height="605" alt="Correlation of Weather Factors With CSP vs PV Energy Output" src="https://github.com/user-attachments/assets/bbe5fe67-f9f5-4584-ab8e-e9c4e788d42a" />)  
+![Correlation Viz] <img width="862" height="605" alt="Correlation of Weather Factors With CSP vs PV Energy Output" src="https://github.com/user-attachments/assets/bbe5fe67-f9f5-4584-ab8e-e9c4e788d42a" /> 
 
 ---
 

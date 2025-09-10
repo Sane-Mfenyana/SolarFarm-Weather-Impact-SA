@@ -522,3 +522,105 @@ These insights tie back to the project’s broader goal:
   - Financial Planners can better price risks around periods of high uncertainty.
   - Future Model Improvements could focus specifically on these high-error windows, rather than uniformly across all hours.
 
+# Step 12: Correlation of Weather Factors With Energy Output
+
+In this step, we quantified how different weather factors influence **CSP** (Concentrated Solar Power) and **PV** (Photovoltaic) energy output. By calculating correlation coefficients, we identified which variables matter most for forecasting and planning renewable energy generation.
+
+---
+
+## SQL Query
+
+```sql
+CREATE OR REPLACE TABLE analysis.solar_correlations AS
+WITH correlations AS (
+  -- Cloud Cover
+  SELECT
+    'Cloud Cover (%)' AS factor,
+    'PV' AS technology,
+    CORR(solar_pv_mw, cloud_cover_percent) AS correlation
+  FROM `analysis.energy_weather_hourly_cloud`
+  UNION ALL
+  SELECT
+    'Cloud Cover (%)' AS factor,
+    'CSP' AS technology,
+    CORR(solar_csp_mw, cloud_cover_percent) AS correlation
+  FROM `analysis.energy_weather_hourly_cloud`
+
+  UNION ALL
+  -- Shortwave Radiation
+  SELECT
+    'Shortwave Radiation (W/m2)' AS factor,
+    'PV' AS technology,
+    CORR(solar_pv_mw, shortwave_radiation_watts_per_m2) AS correlation
+  FROM `analysis.energy_weather_hourly_cloud`
+  UNION ALL
+  SELECT
+    'Shortwave Radiation (W/m2)' AS factor,
+    'CSP' AS technology,
+    CORR(solar_csp_mw, shortwave_radiation_watts_per_m2) AS correlation
+  FROM `analysis.energy_weather_hourly_cloud`
+
+  UNION ALL
+  -- Temperature
+  SELECT
+    'Temperature (°C)' AS factor,
+    'PV' AS technology,
+    CORR(solar_pv_mw, temperature_2m_C) AS correlation
+  FROM `analysis.energy_weather_hourly_cloud`
+  UNION ALL
+  SELECT
+    'Temperature (°C)' AS factor,
+    'CSP' AS technology,
+    CORR(solar_csp_mw, temperature_2m_C) AS correlation
+  FROM `analysis.energy_weather_hourly_cloud`
+
+  UNION ALL
+  -- Windspeed
+  SELECT
+    'Windspeed (m/s)' AS factor,
+    'PV' AS technology,
+    CORR(solar_pv_mw, wind_speed_10m_km_per_hour) AS correlation
+  FROM `analysis.energy_weather_hourly_cloud`
+  UNION ALL
+  SELECT
+    'Windspeed (m/s)' AS factor,
+    'CSP' AS technology,
+    CORR(solar_csp_mw, wind_speed_10m_km_per_hour) AS correlation
+  FROM `analysis.energy_weather_hourly_cloud`
+);
+
+```
+## Visualization
+
+**Correlation of Weather Factors With CSP vs PV Energy Output**
+
+![Correlation Viz](<img width="862" height="605" alt="Correlation of Weather Factors With CSP vs PV Energy Output" src="https://github.com/user-attachments/assets/bbe5fe67-f9f5-4584-ab8e-e9c4e788d42a" />)  
+
+---
+
+## Interpretation of Results
+
+### Shortwave Radiation
+- **Strongest driver** for both technologies.  
+- **PV**: Very high correlation (**0.89**), showing PV output is almost directly tied to irradiance.  
+- **CSP**: Also highly correlated (**0.67**), but slightly less dependent than PV.  
+
+### Temperature
+- **CSP**: Moderately strong positive correlation (**0.61**). Suggests CSP benefits from higher temperatures due to its heat-driven mechanism.  
+- **PV**: Weaker correlation (**0.34**). Indicates PV is less sensitive to temperature, though extremes may affect efficiency.  
+
+### Cloud Cover
+- **PV**: Minimal effect (**0.00 correlation**). PV can still generate under diffuse light.  
+- **CSP**: Slight negative effect (**-0.12 correlation**). CSP requires direct sunlight, so cloud cover is disruptive.  
+
+### Windspeed
+- Negligible for both CSP and PV (**close to 0 correlation**).  
+
+---
+
+## Why This Matters
+- This analysis shows that different solar technologies respond differently to weather variables.  
+- **PV planning**: Solar irradiance (shortwave radiation) is the most important factor, with temperature being secondary.  
+- **CSP planning**: Both irradiance and temperature strongly influence output, and cloud cover introduces greater risk.  
+- These insights help grid operators and energy planners to forecast renewable generation more accurately and design better technology-specific strategies.  
+

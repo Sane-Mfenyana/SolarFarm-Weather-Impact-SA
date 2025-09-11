@@ -624,3 +624,64 @@ WITH correlations AS (
 - **CSP planning**: Both irradiance and temperature strongly influence output, and cloud cover introduces greater risk.  
 - These insights help grid operators and energy planners to forecast renewable generation more accurately and design better technology-specific strategies.  
 
+# Step 13: Build and Evaluate Regression Models for Solar Energy Output
+
+In this step, we apply **BigQuery ML regression models** to analyze how different weather factors (shortwave radiation, temperature, and cloud cover) influence **CSP** and **PV** energy outputs.  
+
+---
+
+## Query – Build PV Regression Model  
+
+```sql
+CREATE OR REPLACE MODEL `renewable.energy_pv_regression`
+OPTIONS(
+  model_type = 'linear_reg',
+  input_label_cols = ['solar_pv_mw']
+) AS
+SELECT
+  solar_pv_mw,
+  shortwave_radiation_watts_per_m2 AS shortwave_radiation,
+  temperature_2m_C AS temperature,
+  cloud_cover_percent AS cloud_cover
+FROM
+  `renewable.eskom_weather_joined`
+WHERE
+  solar_pv_mw IS NOT NULL;
+```
+
+---
+
+## Visualization  
+**Feature Importance: How Weather Factors Influence CSP vs PV (Regression Coefficients)**  
+
+![Viz] <img width="809" height="633" alt="Feature Importance_ How Weather Factors Influence CSP vs PV (Regression Coefficients)" src="https://github.com/user-attachments/assets/eceb0546-7990-411d-a63d-b7b3c54efae5" />
+
+---
+
+## Interpretation of Results  
+
+### Temperature  
+- **CSP:** Strong positive coefficient (+6.79). Higher temperatures significantly boost CSP output, consistent with its heat-driven thermal mechanism.  
+- **PV:** Strong negative coefficient (-15.71). PV efficiency decreases as temperature rises, showing that overheating reduces power generation.  
+
+### Shortwave Radiation  
+- **CSP:** Small positive coefficient (+0.21). Irradiance helps CSP, but it is less dominant compared to temperature.  
+- **PV:** Strong positive coefficient (+2.13). PV output increases directly with irradiance, confirming irradiance is the main driver of PV performance.  
+
+### Cloud Cover  
+- **CSP:** Slight negative coefficient (-0.77). Cloud cover reduces direct sunlight, which CSP needs for concentrated heating.  
+- **PV:** Slight positive coefficient (+0.34). Suggests PV panels still capture diffuse light under cloud cover, softening the impact of overcast conditions.  
+
+---
+
+## Why This Matters  
+This regression analysis highlights **fundamental differences between CSP and PV**:  
+
+- **CSP** thrives in hot, sunny, cloud-free environments. Temperature and irradiance work together to maximize output.  
+- **PV** depends almost entirely on irradiance, but suffers efficiency losses as temperatures climb. It is more tolerant of cloud cover than CSP.  
+
+For **grid planners and policymakers**, this means:  
+- PV is more versatile across varied weather conditions but needs cooling strategies in hot climates.  
+- CSP is riskier in cloudy regions but can deliver stable, high output in consistently sunny, hot environments.  
+
+Together, these insights help determine where **each technology should be deployed for maximum efficiency and reliability**.  

@@ -522,6 +522,8 @@ These insights tie back to the project’s broader goal:
   - Financial Planners can better price risks around periods of high uncertainty.
   - Future Model Improvements could focus specifically on these high-error windows, rather than uniformly across all hours.
 
+---
+
 # Step 12: Correlation of Weather Factors With Energy Output
 
 In this step, we quantified how different weather factors influence **CSP** (Concentrated Solar Power) and **PV** (Photovoltaic) energy output. By calculating correlation coefficients, we identified which variables matter most for forecasting and planning renewable energy generation.
@@ -624,6 +626,8 @@ WITH correlations AS (
 - **CSP planning**: Both irradiance and temperature strongly influence output, and cloud cover introduces greater risk.  
 - These insights help grid operators and energy planners to forecast renewable generation more accurately and design better technology-specific strategies.  
 
+---
+
 # Step 13: Build and Evaluate Regression Models for Solar Energy Output
 
 In this step, we apply **BigQuery ML regression models** to analyze how different weather factors (shortwave radiation, temperature, and cloud cover) influence **CSP** and **PV** energy outputs.  
@@ -685,3 +689,75 @@ For **grid planners and policymakers**, this means:
 - CSP is riskier in cloudy regions but can deliver stable, high output in consistently sunny, hot environments.  
 
 Together, these insights help determine where **each technology should be deployed for maximum efficiency and reliability**.  
+
+---
+
+# Step 14: Seasonal Variability Analysis of Renewable Energy Output
+
+## Objective
+The purpose of this step is to analyze how **solar** and **wind** energy outputs vary across seasons in South Africa.  
+We aim to capture two critical aspects of renewable energy performance:  
+
+1. **Average Output** – how much energy is typically produced.  
+2. **Variability (Standard Deviation)** – how reliable or unpredictable the production is.  
+
+By combining these perspectives, decision-makers can see not just *how much* energy is available, but also *how consistently* it can be delivered.
+
+---
+
+## Dataset Used
+The dataset has already been reshaped into long format with the following fields:  
+
+- **season** → Summer, Autumn, Winter, Spring  
+- **technology** → Solar (PV, CSP, Wind)  
+- **avg_output** → Average output per season (mean production level)  
+- **stddev_output** → Standard deviation per season (variability measure)  
+
+---
+
+## Dashboard Overview
+We consolidated the analysis into **one interactive Tableau dashboard**, instead of multiple standalone visualizations.  
+This approach prevents clutter and allows insights to flow together seamlessly.  
+
+### Dashboard Screenshot
+![Seasonal Renewable Output Dashboard] <img width="999" height="799" alt="Dashboard 1 (1)" src="https://github.com/user-attachments/assets/5cc9ea65-1c2d-4b12-ad6c-19b667b50a9b" />
+
+The dashboard contains four key perspectives:  
+
+1. **Seasonal Averages (Grouped Bars)**  
+   - Shows which technology produces more energy in each season.  
+   - Example: If Solar peaks in Summer but Wind peaks in Winter, this indicates complementary generation patterns.  
+
+2. **Variability by Season & Technology (Grouped Bars)**  
+   - Shows which technology are more/less predictable in each season.  
+   - Example: If Wind in Autumn has high variability, operators may need backup sources.  
+
+3. **Predicted Output with Variability by Season and Technology (Combined View)**  
+   - Normalizes variability against output to show *reliability*.  
+   - Lower ratios = more stable production.  
+   - Example: Solar may have high output in Summer, but if variability is also high, reliability might still be lower than Wind.  
+
+4. **Distribution of Predicted Outputs by Technology (Comparative Boxplot)**
+   - Show overall distribution of outputs per technology across all seasons, focusing on the spread.
+   - Example: Broader spread for wind will indicate high potential but high volatility.
+---
+
+## Insights to Extract
+From the dashboard, the following questions can be answered:  
+
+- **Production Levels**: Which technology consistently delivers more energy in each season?  
+- **Reliability**: Which seasons provide the most predictable output?  
+- **Trade-offs**: Is there a season where higher output comes with higher unpredictability?  
+- **Complementarity**: Do Solar and Wind balance each other across different times of the year?  
+
+---
+
+## Tableau Public Notes
+- Tableau Public does not support native error bars. Instead of using a workaround, we built a **variability ratio line chart**, which directly compares variability against average output.  
+- This replacement keeps the dashboard both insightful and publishable without technical limitations.  
+
+---
+
+## Next Step
+This dashboard is now ready to be published on **Tableau Public** and embedded into the portfolio.  
+The next step will be documenting how this integrates into the broader analysis narrative.  

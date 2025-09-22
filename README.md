@@ -52,7 +52,7 @@ To model energy production accurately, we needed to understand the daily pattern
 *   **Technical evidence:** We visualized this using a dual-axis line chart (Figure 1), clearly showing solar radiation peaking in the "Late Morning" while temperature peaks in the "Afternoon."
 *   **Implication:** This lag is a critical physical phenomenon that any accurate energy forecast model must account for.
 
-![Daily Solar Radiation and Temperature Patterns](https://github.com/user-attachments/assets/5cc9ea65-1c2d-4b12-ad6c-19b667b50a9b)
+![Daily Solar Radiation and Temperature Patterns]<img width="1099" height="849" alt="Daily Solar Radiation and Temperature Patterns (1)" src="https://github.com/user-attachments/assets/f3a80320-e409-4f6c-9ce9-86a2a8649630" />
 ***Figure 1**: Dual-axis chart showing the lag between peak solar radiation (Late Morning) and peak temperature (Afternoon).*
 
 ### 2.3. Key Weather Drivers During Daylight Hours
@@ -62,7 +62,7 @@ We segmented the day into logical buckets to analyze relationships specifically 
 *   **Technical evidence:** Scatter plots (Figure 2) show a positive correlation between temperature and radiation, strongest during peak sun hours (10-15), and a clear inverse relationship between cloud cover and radiation.
 *   **Implication:** Solar farm performance models must consider the time of day to be accurate, as the influence of weather variables is not constant.
 
-![Temperature and Cloud Cover vs. Shortwave Radiation](https://github.com/user-attachments/assets/0c6d3d1a-7b7e-4ab9-a871-e5448797f297)
+![Temperature and Cloud Cover vs. Shortwave Radiation]<img width="999" height="799" alt="Dashboard 1" src="https://github.com/user-attachments/assets/4b0187d1-6066-4072-96cc-8d788eefdcc9" />
 ***Figure 2**: Scatter plots showing the relationship between temperature/cloud cover and solar radiation during daylight hours.*
 
 ---
@@ -78,7 +78,7 @@ We calculated correlation coefficients to measure the strength of the linear rel
 *   **Technical evidence:** The analysis (Figure 3) revealed that shortwave radiation is the strongest driver for PV (correlation: 0.89). For CSP, both radiation (0.67) and temperature (0.61) are important.
 *   **Implication:** PV output is almost directly tied to sunlight intensity, while CSP performance is also significantly boosted by heat.
 
-![Correlation of Weather Factors With CSP vs PV Energy Output](https://github.com/user-attachments/assets/bbe5fe67-f9f5-4584-ab8e-e9c4e788d42a)
+![Correlation of Weather Factors With CSP vs PV Energy Output]<img width="862" height="605" alt="Correlation of Weather Factors With CSP vs PV Energy Output (1)" src="https://github.com/user-attachments/assets/ab5d58a4-aa60-42d4-ab6e-25c15176038b" />
 ***Figure 3**: Correlation analysis between weather factors and energy output for PV and CSP technologies.*
 
 ### 3.2. Building Predictive Models with BigQuery ML
@@ -102,7 +102,7 @@ The models revealed a critical difference in how CSP and PV technologies operate
 *   **Technical evidence:** The regression coefficients (Figure 4) show temperature has a strong positive effect on CSP (+6.79) but a strong negative effect on PV (-15.71).
 *   **Implication:** Technology choice is highly climate-dependent. CSP is ideal for hot, sunny regions, while PV may require cooling solutions in similar environments.
 
-![Feature Importance: How Weather Factors Influence CSP vs PV](https://github.com/user-attachments/assets/eceb0546-7990-411d-a63d-b7b3c54efae5)
+![Feature Importance: How Weather Factors Influence CSP vs PV]<img width="809" height="633" alt="Feature Importance_ How Weather Factors Influence CSP vs PV (Regression Coefficients) (1)" src="https://github.com/user-attachments/assets/89e36008-76f2-4db1-866a-ae1734bda5bd" />
 ***Figure 4**: Regression coefficients (feature weights) from the linear regression models.*
 
 ---
@@ -118,7 +118,7 @@ We evaluated model performance using standard error metrics: Mean Absolute Error
 *   **Technical evidence:** CSP was the most predictable (lowest MAE/RMSE). PV and Wind models showed higher errors, indicating greater real-world volatility (Figure 5).
 *   **Implication:** Forecasts for CSP are more reliable for financial planning. The higher volatility of PV and Wind requires more conservative risk management and backup plans.
 
-![Error Metrics by Technology](https://github.com/user-attachments/assets/03916447-3748-4faa-8092-385f898c4a91)
+![Error Metrics by Technology]<img width="999" height="799" alt="Dashboard 1 (2)" src="https://github.com/user-attachments/assets/494bb0de-6c66-4fd1-b94b-f96957f2da56" />
 ***Figure 5**: Error metrics (MAE, RMSE, MAPE) across the three renewable technologies.*
 
 ### 4.2. When Do the Forecasts Fail? Analyzing Errors by Time of Day
@@ -128,7 +128,7 @@ We discovered that forecast accuracy is not constant; it varies significantly th
 *   **Technical evidence:** The time-of-day error analysis (Figure 6) shows that PV forecast errors (MAE) peak dramatically at midday.
 *   **Implication:** Grid operators need to be most cautious and have reserves ready during peak solar hours, as this is when forecasting uncertainty is greatest.
 
-![Forecast Error by Time of Day and Energy Type](https://github.com/user-attachments/assets/0c6d3d1a-7b7e-4ab9-a871-e5448797f297)
+![Forecast Error by Time of Day and Energy Type]<img width="1119" height="667" alt="Forecast Error by Time of Day and Energy Type (1)" src="https://github.com/user-attachments/assets/3a58af13-8598-4ee9-b184-b6d92ad06394" />
 ***Figure 6**: Analysis of forecast errors (MAE) broken down by time of day and energy type.*
 
 ---
@@ -141,7 +141,7 @@ The final analysis consolidates everything into a strategic, high-level view of 
 *   **Technical evidence:** The seasonal dashboard (Figure 7) shows PV output drops by ~60% in winter, while wind maintains higher but more variable output. CSP shows strong summer performance but with notable variability.
 *   **Implication:** Relying on a single technology creates seasonal gaps and reliability issues. A portfolio combining solar and wind can provide a more stable year-round supply.
 
-![Seasonal Renewable Output: Averages & Variability](https://github.com/user-attachments/assets/5cc9ea65-1c2d-4b12-ad6c-19b667b50a9b)
+![Seasonal Renewable Output: Averages & Variability]<img width="999" height="799" alt="Dashboard 1 (3)" src="https://github.com/user-attachments/assets/29cdfdfb-78ab-408a-a4bf-7cb2ad64cbde" />
 ***Figure 7**: Seasonal analysis showing average output and variability across different technologies.*
 
 ---
@@ -153,7 +153,3 @@ This analysis provides clear, data-driven insights for different stakeholders:
 - **For Grid Operators:** Forecasts are least accurate during peak generation periods (midday for PV). This is when the risk of a supply-demand mismatch is highest, necessitating ready access to reserve power or storage.
 - **For Investors & Project Planners:** Technology choice is critical. CSP is excellent for hot, sunny, cloud-free environments but is a poor fit for cloudy regions. PV is more versatile but requires an understanding of local temperature profiles. Wind offers high output but demands financial models that can handle its volatility.
 - **For Energy Policy:** The complementary profiles of solar (summer-peaking) and wind suggest a diversified renewable portfolio is essential for a resilient and stable grid throughout the year.
-
-### 🚀 Future Work
-- Experiment with more sophisticated models (e.g., XGBoost) to capture non-linear relationships and potentially improve forecast accuracy.
-- Integrate electricity pricing data to assess the direct financial impact of forecast errors, moving from technical accuracy to economic impact.

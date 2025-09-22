@@ -1,763 +1,159 @@
-# SolarFarm-Weather-Impact-SA
-Data analysis of how weather variability impacts solar farm performance in South Africa, using long-term irradiance baselines and hourly weather data for actionable insights.
+# Impact of Weather Variability on Renewable Energy Output in South Africa
 
-## Step 1: Understanding the Weather Context
+A comprehensive data analysis project investigating how weather factors drive the performance of solar (PV and CSP) and wind farms in South Africa. Using statistical analysis and machine learning regression models, this project quantifies key relationships to provide actionable insights for grid operators, investors, and energy planners.
 
-### 🧠 Objective
+## 📊 Project Overview
 
-To examine how temperature and solar irradiance affect solar farm output. This step establishes a foundational understanding of weather patterns so that downstream performance analysis reflects the true driving factors — not just surface-level trends.
+### 🎯 The Mission
+To determine the primary weather drivers of solar and wind energy generation and to evaluate the accuracy of weather-based forecasting models. The goal is to translate meteorological data into strategic insights for operational planning, risk assessment, and investment decisions.
 
-### 🎯Why This Step Matters
+### 🔑 Key Questions
+- How do temperature, solar irradiance, and cloud cover correlate with energy output from PV and CSP technologies?
+- How accurate are weather-based forecasts for predicting renewable generation?
+- How does forecast accuracy and energy output vary by season and time of day?
+- What are the practical implications for grid stability and financial planning?
 
-Understanding weather patterns is important because it allows us to examine the relationship between weather variability and solar farm performance. It also helps determine whether dips in performance are due to natural conditions or hardware issues. Without this context, analysis risks drawing misaligned conclusions. The goal here is to build a weather-performance baseline that supports clearer detection of underperformance.
+### 📁 Data Sources
+- **Open-Meteo Historical API**: Hourly weather data (temperature, solar radiation, cloud cover, wind speed).
+- **Eskom**: Actual historical energy generation data for PV, CSP, and Wind.
 
-## ☀️ Step 2: Weather Data Context
-
-### 🧠 Purpose
-Understanding weather patterns is important because it allows us to examine the possible relationship between weather variability and solar farm performance. This helps us determine whether fluctuations in output are due to natural weather conditions (like cloud cover or solar irradiance) or hardware issues on-site.
-
-By building a weather baseline, we ensure the analysis is grounded in the environmental conditions that drive performance. This prevents misattributing underperformance and enables more accurate insights aligned with the true causes of output variability.
-
----
-
-### 📊 Data Sources & Their Role
-
-| Dataset | Purpose |
-|--------|---------|
-| **Solargis (GHI LTAy Daily Totals GeoTIFF)** | Provides **long-term solar irradiance averages** (LTAy) to serve as a **baseline** for expected solar performance at a geographic location. Helps detect persistent underperformance compared to historical norms. |
-| **Global Solar Atlas (South Africa – GHI daily totals GeoTIFF LTAy)** | Offers a **validated, World Bank-backed source** of long-term solar irradiance data. Acts as a **cross-reference** to Solargis data to ensure accuracy and consistency in baseline solar resource assessments. |
-| **Open-Meteo Hourly Forecasts** | Supplies **short-term hourly weather data** (e.g. temperature, irradiance, cloud cover). Enables **granular daily analysis** of weather’s effect on solar output. Useful for identifying **daily fluctuations and anomalies**. |
-
-## 📊 Step 4: Data Cleaning & Preparation
-
-### Overview
-
-With our weather and solar irradiance datasets acquired, the next step is to prepare the data for analysis. This involves cleaning, formatting, and aligning the datasets so they can be compared over time and across variables.
-
-### Tasks Completed
-
-#### 1. Validated Open-Meteo Hourly Weather Data
-- Verified that all key columns (`time`, `temperature_2m`, `relative_humidity_2m`, `wind_speed_10m`) contain usable hourly values.
-- Confirmed the dataset spans 8,778 rows, ensuring full annual coverage.
-
-#### 2. Assessed File Structure & Metadata
-- Identified that timezone information is consistent but only provided for a single row.
-- UTC offset and timezone abbreviation will be used later to ensure time alignment across sources if needed.
-
-#### 3. Confirmed Integrity of Solargis GHI LTAy Daily Totals (GeoTIFF)
-- This dataset remains untouched for now; we’ll convert and match it to our weather dataset's format in the next step.
-- Solargis serves as our long-term solar irradiance benchmark.
-
-#### 4. Global Solar Atlas GHI Daily Totals (GeoTIFF)
-- Downloaded and validated. Will be used in comparison to Solargis and Open-Meteo to test model robustness and regional irradiance variation.
-
-### Why This Step Matters
-
-Without consistent formatting and structure, we can’t perform accurate time-series analysis. Cleaning ensures we’re not modeling based on missing, misaligned, or misinterpreted data. The hourly weather data gives us granularity; the long-term GHI GeoTIFFs provide historical grounding.
-
-## 🗺️ Step 4.1: Attempt to Extract SolarGIS GeoTIFF Data
-
-As part of this project, I aimed to incorporate long-term average solar irradiance data from SolarGIS (in GeoTIFF format). This data was expected to provide a spatial view of solar potential across South Africa.
-
-### 🔍 What I Tried:
-- Uploaded the `.tif` file to [geotiff.io](https://geotiff.io), but the visual rendering was limited. The raster displayed only in grayscale and lacked the expected color gradient or metadata overlay.
-- Attempted to find alternative open-source, **web-based tools** to parse and extract the raster values (e.g. Mapshaper, GeoTIFF viewer plugins, etc.) but found that most tools require desktop GIS software (like QGIS), which I wanted to avoid for this step.
-
-### ⚠️ Limitation:
-Since this portfolio project is designed to be executed without installing external software, I made the decision to **pause this part** and proceed with the rest of the analysis using the **Open-Meteo hourly weather dataset** — which is sufficient for answering the main research question.
-
-### ✅ Moving Forward:
-The project will still maintain its integrity and value without this spatial layer, as the core focus remains on analyzing **temporal performance variability** in solar and wind energy systems using **real-time weather inputs**.
-
-## 🧪 Step 5: Data Exploration and Quality Check — Weather Data
-
-### 🎯 Objective  
-To understand the structure, quality, and statistical properties of the hourly weather dataset sourced from Open-Meteo. This ensures the data is clean, consistent, and usable for analyzing the impact of weather conditions on solar energy performance in South Africa.
+### 🛠️ Tools & Technologies
+- **Google BigQuery**: Data storage, cleaning, and analysis using SQL.
+- **BigQuery ML**: Building and evaluating linear regression models.
+- **Tableau**: Data visualization and dashboard creation.
 
 ---
 
-### 📂 Dataset Info  
-The file `open-meteo-28.44S21.27E805m.csv` was uploaded to BigQuery and renamed using the following naming conventions to remove unsupported characters and improve clarity:
+## 1. Laying the Foundation: Data Acquisition & Preparation
 
-| Original Field Name                     | Revised Field Name                     |
-|----------------------------------------|----------------------------------------|
-| `time`                                 | `time`                                 |
-| `temperature_2m (°C)`                  | `temperature_2m_c`                     |
-| `relative_humidity_2m (%)`             | `relative_humidity_2m_percent`         |
-| `dew_point_2m (°C)`                    | `dew_point_2m_c`                       |
-| `apparent_temperature (°C)`            | `apparent_temperature_c`               |
-| `precipitation_sum (mm)`              | `precipitation_sum_mm`                 |
-| `rain_sum (mm)`                        | `rain_sum_mm`                          |
-| `wind_speed_10m (km/h)`                | `wind_speed_10m_km_per_h`              |
-| `wind_direction_10m (°)`               | `wind_direction_10m_deg`               |
-| `shortwave_radiation_sum (MJ/m²)`     | `shortwave_radiation_sum_mj_per_m2`    |
-| `et0_fao_evapotranspiration (mm)`     | `et0_fao_evapotranspiration_mm`        |
+The foundation of any robust analysis is clean, reliable data. We started by ensuring our dataset was accurate and ready for analysis.
+
+- **Data Validation**: Verified the integrity of the hourly weather dataset, ensuring full annual coverage (8,778 records) and consistent formatting.
+- **Schema Standardization**: Renamed columns in BigQuery for clarity and compatibility (e.g., `temperature_2m (°C)` became `temperature_2m_c`).
+- **Quality Checks**: Conducted checks for missing values and generated summary statistics to understand data distributions.
 
 ---
 
-### 🔍 Key Checks Performed
+## 2. Finding the Patterns: How Weather Drives Solar Power
 
-#### 5.1. **Sample Preview**  
-We pulled the first 10 rows to verify schema, column types, and value formats:
+We began by asking a fundamental question: which weather factors have the strongest influence on solar radiation? We used scatter plots and correlation analysis to find out.
 
-```sql
-SELECT * 
-FROM `bi-tutrial-401008.open_meteo.meteo_hourly_2`
-LIMIT 10;
-```
-### 5.2. **Time Range & Record Frequency**
-Confirmed the dataset's coverage and granularity:
+### 2.1. Cloud Cover is an Unreliable Predictor on Its Own
+Our first test was to see if cloud cover alone could predict solar radiation. The result was clear: **the relationship is weak and statistically insignificant.**
 
-```sql
-SELECT 
-  MIN(time) AS start_date,
-  MAX(time) AS end_date,
-  COUNT(*) AS total_records,
-  COUNT(DISTINCT time) AS unique_timestamps
-FROM `bi-tutrial-401008.open_meteo.meteo_hourly_2`;
-```
-### 5.33. **Missing Data Check**
-Check for any null values in the three primary weather metrics:
+*   **In plain terms:** You cannot reliably forecast solar power generation using only cloud cover. Some cloudy days still have decent output, and some clear days underperform.
+*   **Technical evidence:** A scatter plot revealed a Pearson correlation coefficient of just -0.065.
+*   **Implication:** This finding immediately ruled out a simple, single-variable model and necessitated a more robust, multi-factor analysis.
 
-```sql
-SELECT
-  COUNTIF(temperature_2m_C IS NULL) AS missing_temperature,
-  COUNTIF(relative_humidity_2m_percent IS NULL) AS missing_humidity,
-  COUNTIF(wind_speed_10m_km_per_hour IS NULL) AS missing_wind_speed
-FROM `bi-tutrial-401008.open_meteo.meteo_hourly_2`;
-```
-### 5.4. **Summary Statistics**
-Generated min, max, average values for key metrcis:
+### 2.2. The Daily Cycle: Sunlight Peaks Before Temperature
+To model energy production accurately, we needed to understand the daily patterns of our key variables. We discovered a consistent lag between peak sunlight and peak temperature.
 
-```sql
-SELECT
-  MIN(temperature_2m_C) AS min_temp,
-  MAX(temperature_2m_C) AS max_temp,
-  AVG(temperature_2m_C) AS avg_temp,
-  
-  MIN(relative_humidity_2m_percent) AS min_humidity,
-  MAX(relative_humidity_2m_percent) AS max_humidity,
-  AVG(relative_humidity_2m_percent) AS avg_humidity,
-  
-  MIN(wind_speed_10m_km_per_hour) AS min_wind,
-  MAX(wind_speed_10m_km_per_hour) AS max_wind,
-  AVG(wind_speed_10m_km_per_hour) AS avg_wind
-FROM `bi-tutrial-401008.open_meteo.meteo_hourly_2`;
-```
+*   **In plain terms:** The sun is strongest around midday, but the day doesn't get hottest until a few hours later, as the earth and air absorb the heat.
+*   **Technical evidence:** We visualized this using a dual-axis line chart (Figure 1), clearly showing solar radiation peaking in the "Late Morning" while temperature peaks in the "Afternoon."
+*   **Implication:** This lag is a critical physical phenomenon that any accurate energy forecast model must account for.
 
-## 📊 Step 6: Visualizing the Relationship Between Cloud Cover and Solar Radiation
+![Daily Solar Radiation and Temperature Patterns](https://github.com/user-attachments/assets/5cc9ea65-1c2d-4b12-ad6c-19b667b50a9b)
+***Figure 1**: Dual-axis chart showing the lag between peak solar radiation (Late Morning) and peak temperature (Afternoon).*
 
-### 🧠 Objective  
-To explore whether **cloud cover (`cloud_cover_percentage`)** is a reliable predictor of **shortwave solar radiation (`shortwave_radiation_watts_per_m2`)** — a key variable affecting solar energy generation.
+### 2.3. Key Weather Drivers During Daylight Hours
+We segmented the day into logical buckets to analyze relationships specifically during active generation periods.
+
+*   **In plain terms:** The connection between weather and solar power changes throughout the day. Higher temperatures correlate with energy output, but this relationship is strongest during peak sunlight hours.
+*   **Technical evidence:** Scatter plots (Figure 2) show a positive correlation between temperature and radiation, strongest during peak sun hours (10-15), and a clear inverse relationship between cloud cover and radiation.
+*   **Implication:** Solar farm performance models must consider the time of day to be accurate, as the influence of weather variables is not constant.
+
+![Temperature and Cloud Cover vs. Shortwave Radiation](https://github.com/user-attachments/assets/0c6d3d1a-7b7e-4ab9-a871-e5448797f297)
+***Figure 2**: Scatter plots showing the relationship between temperature/cloud cover and solar radiation during daylight hours.*
 
 ---
 
-### 🛠️ Tools Used
-- **BigQuery**: SQL queries to filter and sample data  
-- **Tableau Desktop**: Visualized the relationship using a scatter plot  
-- **Open-Meteo API data**: Provided hourly weather observations
+## 3. Building the Forecast: A Model for Each Technology
 
----
+With the relationships understood, we moved to quantify them precisely and build predictive models.
 
-### 🔍 Method  
-We extracted a **random sample of 1,000 hourly rows** using BigQuery, limited to the time period between 2024-01-01 and 2024-06-30:
+### 3.1. Quantifying Relationships with Correlation Analysis
+We calculated correlation coefficients to measure the strength of the linear relationship between weather factors and actual energy output.
 
-```sql
-SELECT
-cloud_cover_percentage,
-  shortwave_radiation_watts_per_m2
-FROM
-  `bi-tutrial-401008.open_meteo.meteo_hourly_2`
-WHERE
-  DATE(datetime) BETWEEN '2024-01-01' AND '2024-06-30'
-ORDER BY RAND()
-LIMIT 1000;
-```
-This was exported and visualized in Tableau using a scatter plot where:
-- X-axis = `cloud_cover_percent`
-- Y-axis = `shortwave_radiation_watts_per_m2`
+*   **In plain terms:** We measured how closely changes in weather "move together" with changes in energy output. A value close to 1 or -1 means a strong relationship.
+*   **Technical evidence:** The analysis (Figure 3) revealed that shortwave radiation is the strongest driver for PV (correlation: 0.89). For CSP, both radiation (0.67) and temperature (0.61) are important.
+*   **Implication:** PV output is almost directly tied to sunlight intensity, while CSP performance is also significantly boosted by heat.
 
-### 📈 Finding
-The relationship is visually weak and statistically insignificant, with a Pearson correlation coefficient of -0.065. This implies:
-- Cloud cover has some negative effect, but not enough to act as a standalone predictor.
-- The scatter plot showed high variability in radiation even at similar cloud cover levels.
+![Correlation of Weather Factors With CSP vs PV Energy Output](https://github.com/user-attachments/assets/bbe5fe67-f9f5-4584-ab8e-e9c4e788d42a)
+***Figure 3**: Correlation analysis between weather factors and energy output for PV and CSP technologies.*
 
-### 💡 Business Implication
-**Relying solely on cloud cover to estimate solar performance is unreliable.**
-Energy analysts or solar operations managers should not base decisions on cloud cover alone. Other weather variables (e.g. humidity, temperature, air pressure, precipitation) must be considered. 
-This insight helps narrow the modeling focus for building more robust predictors of solar generation performance.
-
-## 📊 Step 7: Time-Bucketed Wind Speed vs Solar Radiation Analysis
-
-### 🎯 Objective
-To investigate whether wind speed has a significant correlation with solar radiation and whether this relationship is influenced by the time of day — particularly during daylight hours when solar energy generation is most active.
-
-### 🛠️ Method
-1. **Data Queried** from Open-Meteo hourly weather data:
-   ```sql
-   SELECT
-     DATE(time) AS day,
-     EXTRACT(HOUR FROM time) AS hour,
-     wind_speed_10m_km_per_hour,
-     shortwave_radiation_watts_per_m2
-   FROM
-     `bi-tutorial-401008.open_meteo.meteo_hourly_2`
-   WHERE
-     shortwave_radiation_watts_per_m2 > 0
-   ```
-2. **Calculated Field in Tableau:
-   IF [hour] >= 6 AND [hour] <= 9 THEN "06–09"
-   ELSEIF [hour] >= 10 AND [hour] <= 12 THEN "10–12"
-   ELSEIF [hour] >= 13 AND [hour] <= 15 THEN "13–15"
-   ELSEIF [hour] >= 16 AND [hour] <= 18 THEN "16–18"
-   ELSE "Other"
-   END
-3. **Visualisation:
-   A scatter plot was created:
-  - X-axis: `wind_speed_10m_km_per_hour`
-  - Y-axis: `shortwave_radiation_watts_per_m2`
-  - Color: Hour Bucket (calculated field)
-  - Filtered to exclude "Other" time groups (non-daylight hours).
-
-## 📈 Key Insight
-- When viewed as a whole, no strong linear correlation is observed between wind speed and solar radiation.
-- However, clear daylight patterns emerge:
-  - Midday hours (10–15) concentrate the highest solar radiation, regardless of wind speed.
-  - Morning and late afternoon show lower radiation levels, consistent with expected sun angle and exposure.
- 
-This reveals that solar performance analysis must account for time-of-day effects, and that meteorological correlations may only appear when data is     appropriately segmented.
-
-## ✅ Next Step
-We now move on to analyze temperature and cloud cover effects on solar radiation, maintaining the same hourly segmentation to isolate meaningful patterns across weather variables.
-  
-## 📊 Step 8: Exploratory Analysis — Weather vs Solar Radiation
-
-In this step, we visually explored how temperature and cloud cover affect solar irradiance (shortwave radiation) across key daylight hours. This helped us assess how weather variability might explain fluctuations in solar energy potential.
-
----
-
-### 🔍 Objectives
-
-- Examine **how temperature correlates** with shortwave radiation throughout the day.
-- Investigate **how cloud cover affects solar radiation**, especially during peak sunlight hours.
-- Begin identifying **hourly patterns** that can impact solar farm efficiency.
-
----
-
-### 🔁 Hour Buckets Defined
-
-To observe clear intra-day trends, we grouped the data into 4 logical time segments:
-
-| Hour Bucket | Time Range       |
-|-------------|------------------|
-| 06–09       | Early Morning    |
-| 10–12       | Late Morning     |
-| 13–15       | Early Afternoon  |
-| 16–18       | Late Afternoon   |
-
----
-
-### 📈 Visualizations
-
-#### 1. Temperature vs Shortwave Radiation
-
-This scatter plot reveals a **positive correlation** between air temperature and solar radiation — but the strength of this relationship changes depending on the hour bucket. Notably:
-- Radiation increases with temperature up to a saturation point (~28–35°C).
-- Earlier hours (06–09) show lower radiation despite rising temperatures — consistent with the sun’s position.
-
-#### 2. Cloud Cover vs Shortwave Radiation
-
-This second plot highlights a clear **inverse relationship** between cloud cover and radiation:
-- High radiation levels are more likely when cloud cover is **low (0–20%)**.
-- There’s a wide radiation range even with partial cloud cover, suggesting other variables (like humidity, elevation, or haze) may also play a role.
-
----
-
-### 🧠 Key Insights
-
-- **Morning sunlight hours are less productive**, even if the temperature is rising — likely due to lower sun angles.
-- **High radiation occurs most consistently between 10:00 and 15:00**, especially on clear days.
-- **Cloud cover >80% almost always results in minimal solar radiation**, indicating potential downtime for solar panel output.
-
----
-
-## Step 9: Visualization of Hourly Weather Patterns – Box Plots & Dual-Axis Chart
-
-### 🎯 Goal
-To visualize and compare **temperature** and **shortwave radiation** distributions across different times of day, and to explore the lag effect between radiation peaks and temperature peaks.
-
----
-
-### 🛠 Methods & Micro Steps
-
-#### 1. **Data Source**
-- Used previously extracted **non-aggregated hourly weather dataset** from BigQuery.
-- Columns used:  
-  - `datetime` – Timestamp of reading  
-  - `temperature_C` – Air temperature (°C)  
-  - `shortwave_radiation` – Solar radiation (W/m²)  
-  - `windspeed_kph` – Wind speed (km/h)
-
----
-
-#### 2. **Time-of-Day Buckets (Tableau Calculated Field)**
-Created a calculated field to group hours into logical daily periods:
-```tableau
-IF DATEPART('hour', [datetime]) >= 0 AND DATEPART('hour', [datetime]) <= 5 THEN 'Night'
-ELSEIF DATEPART('hour', [datetime]) >= 6 AND DATEPART('hour', [datetime]) <= 9 THEN 'Early Morning'
-ELSEIF DATEPART('hour', [datetime]) >= 10 AND DATEPART('hour', [datetime]) <= 13 THEN 'Late Morning'
-ELSEIF DATEPART('hour', [datetime]) >= 14 AND DATEPART('hour', [datetime]) <= 17 THEN 'Afternoon'
-ELSEIF DATEPART('hour', [datetime]) >= 18 AND DATEPART('hour', [datetime]) <= 21 THEN 'Evening'
-ELSE 'Late Night'
-END
-```
-- Applied custom sort to ensure buckets follow a chronological order.
-
-### 3. **Box Plot Creation**
-- First Box Plot: Temperature vs Time of Day.
-  - Measure: `temperature_C` aggregated as AVG.
-- Second Box Plot: Shortwave Radiation vs Time of Day
-  - Measure: `shortwave_radiation` aggregated as AVG.
- 
-### 4. **Dual-Axis Line Chart**
-- Plotted Temperature and Shortwave Radiation against `time_of_day_bucket`.
-- Set Temperature on primary axis and Shortwave Radiation on secondary axis.
-- Renamed axes:
-  - Temperature C
-  - Shortwave Radiation (W/m2)
-
-### 5. **Annotations**
-- Added annotation boxes to highlight Late Morning and Afternoon as periods of peak shortwave radiation.
-- Noted lag between radiation peak and temperature peak.
-
-### 6. **Dashboard Layout Finalization**
-- Placed legend above visualizations for clarity and to reduce vertical spacing.
-- Added descriptive dashboard title.
-- Arranged both box plots and dual-axis chart to maximize comparative readability.
-
-### 📊 **Insights**
-- Peak solar radiation consistently occurs in Late Morning to Early Afternoon.
-- Temperature peaks lag behind radiation peaks, likely due to the time it takes for the environment to absorb and re-radiate heat.
-- Box plots reveal greater variability in shortwave radiation than temperature, especially in transitional periods (morning and evening).
-- The dual-axis chart confirms a clear correlation between radiation and temperature, but also shows that weather conditions can cause daily deviations.
-
-# Step 10: Evaluate Forecasting Accuracy with Error Metrics
-
-In this step, we measure how well our weather-based energy forecasts align with the actual recorded generation data across **Photovoltaic (PV)**, **Concentrated Solar Power (CSP)**, and **Wind** energy sources.  
-
-By calculating **MAE, RMSE, and MAPE**, we quantify the **forecast accuracy** — which directly impacts both operational planning and financial outcomes for renewable energy investments.
-
----
-
-## Why Error Metrics Matter
-
-Forecast errors affect:
-
-- **Operational Decisions**  
-  Utilities and Independent Power Producers (IPPs) rely on accurate forecasts to plan grid balancing, storage usage, and reserve power requirements.  
-
-- **Financial Performance**  
-  Large errors can mean overestimating or underestimating supply, which either forces **load shedding (supply shortfall)** or incurs **penalties and imbalance costs**.  
-
-- **Investor Confidence**  
-  Smaller, consistent errors improve investor trust in renewable projects by showing that generation outputs can be reliably forecasted.
-
----
-
-## Metrics Explained
-
-### 1. **Mean Absolute Error (MAE)**
-- **Formula:** Average of the absolute difference between forecasted and actual values.  
-- **Interpretation:** On average, how many MW the forecasts are off by.  
-- **Results:**  
-  - PV = **545.48**  
-  - CSP = **79.52**  
-  - Wind = **641.62**  
-
-➡️ CSP has the lowest MAE, meaning its forecasts are closest on average. PV and Wind deviate more.  
-
----
-
-### 2. **Root Mean Squared Error (RMSE)**
-- **Formula:** Square root of the average squared difference between forecasted and actual values.  
-- **Interpretation:** Penalizes larger errors more heavily. Good for spotting volatility.  
-- **Results:**  
-  - PV = **817.04**  
-  - CSP = **100.89**  
-  - Wind = **768.36**  
-
-➡️ CSP again shows strong stability. PV and Wind not only deviate more, but their larger forecasting errors are more volatile.  
-
----
-
-### 3. **Mean Absolute Percentage Error (MAPE)**
-- **Formula:** Average of the absolute percentage errors relative to actual values.  
-- **Interpretation:** Shows how big the errors are compared to actual generation, expressed as a percentage.  
-- **Results:**  
-  - PV = **158,383.67%**  
-  - CSP = **9,989.43%**  
-  - Wind = **101.22%**  
-
-➡️ CSP and PV show extremely inflated MAPE values due to very small actual generation numbers at certain times (division by values close to zero exaggerates error). Wind shows a more interpretable error rate (~101%).  
-
----
-
-## Insights for the Project
-
-1. **CSP is the most predictable** of the three, with the lowest MAE and RMSE.  
-2. **PV has high error volatility**, which matches the reality of solar being highly sensitive to sudden weather shifts (cloud cover, radiation changes).  
-3. **MAPE is unreliable** in cases where actual generation is near zero — but it highlights the risk of underperforming forecasts during low-output periods.  
-4. These metrics give **hard evidence** that forecast uncertainty varies by energy source, and that financial models must account for these risks when estimating **returns, penalties, or reserve energy costs**.  
-
----
-
-# Step 10: Evaluate Model Performance Against Actuals
-
-In this step, we tested how well our regression models (PV, CSP, Wind) performed when compared against **actual Eskom generation data**. This is where our analysis transitioned from pure modeling into validation, helping us assess the reliability of using weather as a predictor of renewable energy output.
-
----
-
-## Key Evaluation Metrics
-
-We calculated three core error metrics to evaluate each energy type:
-
-- **MAE (Mean Absolute Error):**  
-  Measures average absolute error in predictions. Lower values = better accuracy.  
-
-- **RMSE (Root Mean Square Error):**  
-  Gives higher weight to large errors, making it sensitive to big misses.  
-
-- **MAPE (Mean Absolute Percentage Error):**  
-  Expresses error as a percentage of actual values. Useful for interpretability, though unstable with very small denominators.  
-
----
-
-## Results
-
-| Energy Type | MAE    | RMSE    | MAPE        |
-|-------------|--------|---------|-------------|
-| PV          | 545.48 | 817.04  | 158,383.67  |
-| CSP         | 79.52  | 100.89  | 9,989.43    |
-| Wind        | 641.62 | 768.36  | 101.22      |
-
-**Interpretation:**  
-- CSP showed the **lowest error across all metrics**, meaning its relationship with weather was captured more reliably by the model.  
-- PV and Wind models displayed **large errors**, suggesting higher variability and that more features (or better geographic alignment of data) may be required to improve predictions.  
-
----
-
-## Visualization
-
-We created a grouped bar chart to summarize the error metrics across energy types.
-
-### Static Preview
-<img width="777" height="659" alt="Error Metrics by Technology_ Comparing Model vs Actual Power Output" src="https://github.com/user-attachments/assets/03916447-3748-4faa-8092-385f898c4a91" />
-
-
-### Interactive Dashboard
-[View Interactive Tableau Dashboard](https://public.tableau.com/views/ErrorMetricsComparisonAcrossRenewableTechnologies/Dashboard1?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link)
-
-This dual approach allows immediate readability through the static chart, while also demonstrating interactivity and BI skill via Tableau Public.
-
----
-
-## Why This Matters
-
-Validating models against **real-world energy data** bridges the gap between theory and practice. For renewable energy stakeholders, this type of evaluation:  
-- Highlights which technologies (PV, CSP, Wind) are more predictable based on weather.  
-- Identifies where **financial forecasting is more stable** (e.g.CSP) versus where risk is higher (PV, Wind).  
-- Sets the stage for translating weather-driven performance into **economic impacts and decision-making value**.  
-
----
-
-# Step 11: Time-of-Day Analysis of Forecast Errors
-
-In this step, we assessed how model accuracy varied by **time of day**, breaking the results into the buckets defined earlier: *Morning, Midday, Afternoon, Evening, Night*. This helped us understand whether systematic over- or under-prediction occurred during certain periods.
-
----
-
-## Query: Time-of-Day Error Metrics (MAE)
-
-We grouped forecast errors by energy type and time bucket, then calculated the **Mean Absolute Error (MAE)**:
-
-```sql
-CREATE OR REPLACE TABLE analysis.error_by_time_bucket AS
-SELECT
-  energy_type,
-  time_bucket,
-  AVG(ABS(predicted_output - actual_output)) AS mae
-FROM `analysis.model_vs_actual_long`
-GROUP BY energy_type, time_bucket
-ORDER BY energy_type, time_bucket;
-```
-## Visualization
-
-We created a grouped bar chart, comparing MAE across different time buckets for each renewable type (PV, CSP & Wind).
-
-### Static Preview
-<img width="1119" height="667" alt="Forecast Error by Time of Day and Energy Type" src="https://github.com/user-attachments/assets/0c6d3d1a-7b7e-4ab9-a871-e5448797f297" />
-
-## Interpretation of Results
-
-- PV (Solar Photovoltaic):
-  - Error peaked at Midday (MAE ~1400), when solar generation is highest and weather-driven variability is strongest.
-  - Morning (893) and Afternoon (573) also showed higher errors compared to Night or Evening, reflecting model difficulty in capturing ramp-up and ramp-down.
-  - Evening (82) and Night (54) had very low errors, as expected, since PV output is nearly zero and easy to predict.
-- CSP (Concentrated Solar Power):
-  - Errors were highest in the Evening (103) and Afternoon (101), showing difficulty in capturing thermal storage/release effects.
-  - Morning (67) and Midday (79) had moderate errors, aligning with the sun's rising and peak activity.
-  - Night (54) again showed the lowest error.
-- Wind:
-  - Errors were relatively more stable across the day but peaked at Midday (801) and Morning (686).
-  - Afternoon (618) and Night (587) were slightly better, while Evening (553) showed the lowest error.
-  - This reflects the complex and less predictable diurnal wind patterns.
- 
-## Why This Matters
-
-This analysis demonstrates that forecast errors are not evenly distributed across the day:
-  - Solar (PV, CSP) models struggle most when generation is highest (midday, afternoon).
-  - Wind has less predictable daytime variability, but nighttime predictions are relatively more reliable.
-These insights tie back to the project’s broader goal:
-  - Grid Operators can use this to anticipate when renewable forecasts are least reliable (e.g., midday solar peaks).
-  - Financial Planners can better price risks around periods of high uncertainty.
-  - Future Model Improvements could focus specifically on these high-error windows, rather than uniformly across all hours.
-
----
-
-# Step 12: Correlation of Weather Factors With Energy Output
-
-In this step, we quantified how different weather factors influence **CSP** (Concentrated Solar Power) and **PV** (Photovoltaic) energy output. By calculating correlation coefficients, we identified which variables matter most for forecasting and planning renewable energy generation.
-
----
-
-## SQL Query
-
-```sql
-CREATE OR REPLACE TABLE analysis.solar_correlations AS
-WITH correlations AS (
-  -- Cloud Cover
-  SELECT
-    'Cloud Cover (%)' AS factor,
-    'PV' AS technology,
-    CORR(solar_pv_mw, cloud_cover_percent) AS correlation
-  FROM `analysis.energy_weather_hourly_cloud`
-  UNION ALL
-  SELECT
-    'Cloud Cover (%)' AS factor,
-    'CSP' AS technology,
-    CORR(solar_csp_mw, cloud_cover_percent) AS correlation
-  FROM `analysis.energy_weather_hourly_cloud`
-
-  UNION ALL
-  -- Shortwave Radiation
-  SELECT
-    'Shortwave Radiation (W/m2)' AS factor,
-    'PV' AS technology,
-    CORR(solar_pv_mw, shortwave_radiation_watts_per_m2) AS correlation
-  FROM `analysis.energy_weather_hourly_cloud`
-  UNION ALL
-  SELECT
-    'Shortwave Radiation (W/m2)' AS factor,
-    'CSP' AS technology,
-    CORR(solar_csp_mw, shortwave_radiation_watts_per_m2) AS correlation
-  FROM `analysis.energy_weather_hourly_cloud`
-
-  UNION ALL
-  -- Temperature
-  SELECT
-    'Temperature (°C)' AS factor,
-    'PV' AS technology,
-    CORR(solar_pv_mw, temperature_2m_C) AS correlation
-  FROM `analysis.energy_weather_hourly_cloud`
-  UNION ALL
-  SELECT
-    'Temperature (°C)' AS factor,
-    'CSP' AS technology,
-    CORR(solar_csp_mw, temperature_2m_C) AS correlation
-  FROM `analysis.energy_weather_hourly_cloud`
-
-  UNION ALL
-  -- Windspeed
-  SELECT
-    'Windspeed (m/s)' AS factor,
-    'PV' AS technology,
-    CORR(solar_pv_mw, wind_speed_10m_km_per_hour) AS correlation
-  FROM `analysis.energy_weather_hourly_cloud`
-  UNION ALL
-  SELECT
-    'Windspeed (m/s)' AS factor,
-    'CSP' AS technology,
-    CORR(solar_csp_mw, wind_speed_10m_km_per_hour) AS correlation
-  FROM `analysis.energy_weather_hourly_cloud`
-);
-
-```
-## Visualization
-
-**Correlation of Weather Factors With CSP vs PV Energy Output**
-
-![Correlation Viz] <img width="862" height="605" alt="Correlation of Weather Factors With CSP vs PV Energy Output" src="https://github.com/user-attachments/assets/bbe5fe67-f9f5-4584-ab8e-e9c4e788d42a" /> 
-
----
-
-## Interpretation of Results
-
-### Shortwave Radiation
-- **Strongest driver** for both technologies.  
-- **PV**: Very high correlation (**0.89**), showing PV output is almost directly tied to irradiance.  
-- **CSP**: Also highly correlated (**0.67**), but slightly less dependent than PV.  
-
-### Temperature
-- **CSP**: Moderately strong positive correlation (**0.61**). Suggests CSP benefits from higher temperatures due to its heat-driven mechanism.  
-- **PV**: Weaker correlation (**0.34**). Indicates PV is less sensitive to temperature, though extremes may affect efficiency.  
-
-### Cloud Cover
-- **PV**: Minimal effect (**0.00 correlation**). PV can still generate under diffuse light.  
-- **CSP**: Slight negative effect (**-0.12 correlation**). CSP requires direct sunlight, so cloud cover is disruptive.  
-
-### Windspeed
-- Negligible for both CSP and PV (**close to 0 correlation**).  
-
----
-
-## Why This Matters
-- This analysis shows that different solar technologies respond differently to weather variables.  
-- **PV planning**: Solar irradiance (shortwave radiation) is the most important factor, with temperature being secondary.  
-- **CSP planning**: Both irradiance and temperature strongly influence output, and cloud cover introduces greater risk.  
-- These insights help grid operators and energy planners to forecast renewable generation more accurately and design better technology-specific strategies.  
-
----
-
-# Step 13: Build and Evaluate Regression Models for Solar Energy Output
-
-In this step, we apply **BigQuery ML regression models** to analyze how different weather factors (shortwave radiation, temperature, and cloud cover) influence **CSP** and **PV** energy outputs.  
-
----
-
-## Query – Build PV Regression Model  
+### 3.2. Building Predictive Models with BigQuery ML
+We used machine learning to create models that could predict energy output based on weather inputs.
 
 ```sql
 CREATE OR REPLACE MODEL `renewable.energy_pv_regression`
-OPTIONS(
-  model_type = 'linear_reg',
-  input_label_cols = ['solar_pv_mw']
-) AS
+OPTIONS(model_type = 'linear_reg') AS
 SELECT
   solar_pv_mw,
   shortwave_radiation_watts_per_m2 AS shortwave_radiation,
   temperature_2m_C AS temperature,
   cloud_cover_percent AS cloud_cover
-FROM
-  `renewable.eskom_weather_joined`
-WHERE
-  solar_pv_mw IS NOT NULL;
+FROM `renewable.eskom_weather_joined`;
 ```
 
----
+### 3.3. Interpreting the Models: A Tale of Two Technologies
+The models revealed a critical difference in how CSP and PV technologies operate.
 
-## Visualization  
-**Feature Importance: How Weather Factors Influence CSP vs PV (Regression Coefficients)**  
+*   **In plain terms:** CSP plants, which use heat to generate power, perform better on hotter days. Conversely, PV panels become less efficient as they get hotter, so their output can decrease during heatwaves.
+*   **Technical evidence:** The regression coefficients (Figure 4) show temperature has a strong positive effect on CSP (+6.79) but a strong negative effect on PV (-15.71).
+*   **Implication:** Technology choice is highly climate-dependent. CSP is ideal for hot, sunny regions, while PV may require cooling solutions in similar environments.
 
-![Viz] <img width="809" height="633" alt="Feature Importance_ How Weather Factors Influence CSP vs PV (Regression Coefficients)" src="https://github.com/user-attachments/assets/eceb0546-7990-411d-a63d-b7b3c54efae5" />
-
----
-
-## Interpretation of Results  
-
-### Temperature  
-- **CSP:** Strong positive coefficient (+6.79). Higher temperatures significantly boost CSP output, consistent with its heat-driven thermal mechanism.  
-- **PV:** Strong negative coefficient (-15.71). PV efficiency decreases as temperature rises, showing that overheating reduces power generation.  
-
-### Shortwave Radiation  
-- **CSP:** Small positive coefficient (+0.21). Irradiance helps CSP, but it is less dominant compared to temperature.  
-- **PV:** Strong positive coefficient (+2.13). PV output increases directly with irradiance, confirming irradiance is the main driver of PV performance.  
-
-### Cloud Cover  
-- **CSP:** Slight negative coefficient (-0.77). Cloud cover reduces direct sunlight, which CSP needs for concentrated heating.  
-- **PV:** Slight positive coefficient (+0.34). Suggests PV panels still capture diffuse light under cloud cover, softening the impact of overcast conditions.  
+![Feature Importance: How Weather Factors Influence CSP vs PV](https://github.com/user-attachments/assets/eceb0546-7990-411d-a63d-b7b3c54efae5)
+***Figure 4**: Regression coefficients (feature weights) from the linear regression models.*
 
 ---
 
-## Why This Matters  
-This regression analysis highlights **fundamental differences between CSP and PV**:  
+## 4. Stress-Testing Our Models: How Accurate Are the Forecasts?
 
-- **CSP** thrives in hot, sunny, cloud-free environments. Temperature and irradiance work together to maximize output.  
-- **PV** depends almost entirely on irradiance, but suffers efficiency losses as temperatures climb. It is more tolerant of cloud cover than CSP.  
+A model is only useful if it's accurate. We rigorously tested our forecasts against actual historical data.
 
-For **grid planners and policymakers**, this means:  
-- PV is more versatile across varied weather conditions but needs cooling strategies in hot climates.  
-- CSP is riskier in cloudy regions but can deliver stable, high output in consistently sunny, hot environments.  
+### 4.1. Overall Forecast Error Metrics
+We evaluated model performance using standard error metrics: Mean Absolute Error (MAE), Root Mean Square Error (RMSE), and Mean Absolute Percentage Error (MAPE).
 
-Together, these insights help determine where **each technology should be deployed for maximum efficiency and reliability**.  
+*   **In plain terms:** We measured the average size of the forecast errors. Lower numbers are better. MAE tells us the average error, while RMSE penalizes large errors more heavily.
+*   **Technical evidence:** CSP was the most predictable (lowest MAE/RMSE). PV and Wind models showed higher errors, indicating greater real-world volatility (Figure 5).
+*   **Implication:** Forecasts for CSP are more reliable for financial planning. The higher volatility of PV and Wind requires more conservative risk management and backup plans.
 
----
+![Error Metrics by Technology](https://github.com/user-attachments/assets/03916447-3748-4faa-8092-385f898c4a91)
+***Figure 5**: Error metrics (MAE, RMSE, MAPE) across the three renewable technologies.*
 
-# Step 14: Seasonal Variability Analysis of Renewable Energy Output
+### 4.2. When Do the Forecasts Fail? Analyzing Errors by Time of Day
+We discovered that forecast accuracy is not constant; it varies significantly throughout the day.
 
-## Objective
-The purpose of this step is to analyze how **solar** and **wind** energy outputs vary across seasons in South Africa.  
-We aim to capture two critical aspects of renewable energy performance:  
+*   **In plain terms:** Our solar forecasts are least accurate exactly when it matters most—in the middle of the day when the sun is brightest and generation is highest. This is when unexpected clouds or weather changes have the biggest impact.
+*   **Technical evidence:** The time-of-day error analysis (Figure 6) shows that PV forecast errors (MAE) peak dramatically at midday.
+*   **Implication:** Grid operators need to be most cautious and have reserves ready during peak solar hours, as this is when forecasting uncertainty is greatest.
 
-1. **Average Output** – how much energy is typically produced.  
-2. **Variability (Standard Deviation)** – how reliable or unpredictable the production is.  
-
-By combining these perspectives, decision-makers can see not just *how much* energy is available, but also *how consistently* it can be delivered.
-
----
-
-## Dataset Used
-The dataset has already been reshaped into long format with the following fields:  
-
-- **season** → Summer, Autumn, Winter, Spring  
-- **technology** → Solar (PV, CSP, Wind)  
-- **avg_output** → Average output per season (mean production level)  
-- **stddev_output** → Standard deviation per season (variability measure)  
+![Forecast Error by Time of Day and Energy Type](https://github.com/user-attachments/assets/0c6d3d1a-7b7e-4ab9-a871-e5448797f297)
+***Figure 6**: Analysis of forecast errors (MAE) broken down by time of day and energy type.*
 
 ---
 
-## Dashboard Overview
-We consolidated the analysis into **one interactive Tableau dashboard**, instead of multiple standalone visualizations.  
-This approach prevents clutter and allows insights to flow together seamlessly.  
+## 5. The Big Picture: Seasonal Performance and Risks
 
-### Dashboard Screenshot
-![Seasonal Renewable Output Dashboard] <img width="999" height="799" alt="Dashboard 1 (1)" src="https://github.com/user-attachments/assets/5cc9ea65-1c2d-4b12-ad6c-19b667b50a9b" />
+The final analysis consolidates everything into a strategic, high-level view of performance and reliability across the entire year.
 
-The dashboard contains four key perspectives:  
+*   **In plain terms:** Each technology has a "season." Solar power is strong in summer but weak in winter. Wind energy is a major contributor year-round but is highly unpredictable. A diversified mix is essential.
+*   **Technical evidence:** The seasonal dashboard (Figure 7) shows PV output drops by ~60% in winter, while wind maintains higher but more variable output. CSP shows strong summer performance but with notable variability.
+*   **Implication:** Relying on a single technology creates seasonal gaps and reliability issues. A portfolio combining solar and wind can provide a more stable year-round supply.
 
-1. **Seasonal Averages (Grouped Bars)**  
-   - Shows which technology produces more energy in each season.  
-   - Example: If Solar peaks in Summer but Wind peaks in Winter, this indicates complementary generation patterns.  
-
-2. **Variability by Season & Technology (Grouped Bars)**  
-   - Shows which technology are more/less predictable in each season.  
-   - Example: If Wind in Autumn has high variability, operators may need backup sources.  
-
-3. **Predicted Output with Variability by Season and Technology (Combined View)**  
-   - Normalizes variability against output to show *reliability*.  
-   - Lower ratios = more stable production.  
-   - Example: Solar may have high output in Summer, but if variability is also high, reliability might still be lower than Wind.  
-
-4. **Distribution of Predicted Outputs by Technology (Comparative Boxplot)**
-   - Show overall distribution of outputs per technology across all seasons, focusing on the spread.
-   - Example: Broader spread for wind will indicate high potential but high volatility.
----
-
-## Insights to Extract
-From the dashboard, the following questions can be answered:  
-
-- **Production Levels**: Which technology consistently delivers more energy in each season?  
-- **Reliability**: Which seasons provide the most predictable output?  
-- **Trade-offs**: Is there a season where higher output comes with higher unpredictability?  
-- **Complementarity**: Do Solar and Wind balance each other across different times of the year?  
+![Seasonal Renewable Output: Averages & Variability](https://github.com/user-attachments/assets/5cc9ea65-1c2d-4b12-ad6c-19b667b50a9b)
+***Figure 7**: Seasonal analysis showing average output and variability across different technologies.*
 
 ---
 
-## Tableau Public Notes
-- Tableau Public does not support native error bars. Instead of using a workaround, we built a **variability ratio line chart**, which directly compares variability against average output.  
-- This replacement keeps the dashboard both insightful and publishable without technical limitations.  
+## 6. Conclusion & Actionable Insights: A Guide for Decision-Makers
 
----
+This analysis provides clear, data-driven insights for different stakeholders:
 
-## Next Step
-This dashboard is now ready to be published on **Tableau Public** and embedded into the portfolio.  
-The next step will be documenting how this integrates into the broader analysis narrative.  
+- **For Grid Operators:** Forecasts are least accurate during peak generation periods (midday for PV). This is when the risk of a supply-demand mismatch is highest, necessitating ready access to reserve power or storage.
+- **For Investors & Project Planners:** Technology choice is critical. CSP is excellent for hot, sunny, cloud-free environments but is a poor fit for cloudy regions. PV is more versatile but requires an understanding of local temperature profiles. Wind offers high output but demands financial models that can handle its volatility.
+- **For Energy Policy:** The complementary profiles of solar (summer-peaking) and wind suggest a diversified renewable portfolio is essential for a resilient and stable grid throughout the year.
+
+### 🚀 Future Work
+- Experiment with more sophisticated models (e.g., XGBoost) to capture non-linear relationships and potentially improve forecast accuracy.
+- Integrate electricity pricing data to assess the direct financial impact of forecast errors, moving from technical accuracy to economic impact.

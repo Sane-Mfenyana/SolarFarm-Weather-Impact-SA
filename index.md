@@ -36,5 +36,3 @@ A critical finding: **higher temperatures BOOST CSP output but REDUCE PV efficie
 - **[SQL Code & BigQuery ML Models](./sql_code/bqml_analysis.sql)**
 
 *This project was built with Google BigQuery, BigQuery ML, SQL, and Tableau.*
-
-theme: jekyll-theme-cayman
